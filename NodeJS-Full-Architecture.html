@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Next.js Architecture</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-rows: auto auto auto auto;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .layer {
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .layer:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .layer-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .client-layer {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+        .nextjs-core {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #2d3748;
+            grid-column: 2;
+            grid-row: 1 / 3;
+        }
+        .server-layer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .build-layer {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #2d3748;
+            grid-column: 1 / 4;
+        }
+        .file-structure {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #2d3748;
+        }
+        .external-services {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #2d3748;
+        }
+        .deployment {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            color: #2d3748;
+            grid-column: 1 / 4;
+        }
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .component {
+            background: rgba(255,255,255,0.9);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .component:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .client-layer .component {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .server-layer .component {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .nextjs-features {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .feature-group {
+            background: rgba(255,255,255,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .feature-group h4 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: #2d3748;
+        }
+        .feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-list li {
+            padding: 5px 0;
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        .feature-list li:before {
+            content: "✓ ";
+            color: #48bb78;
+            font-weight: bold;
+        }
+        .flow-description {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .flow-description h3 {
+            margin: 0 0 15px 0;
+            color: #2d3748;
+            font-size: 1.4em;
+        }
+        .flow-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .flow-step {
+            background: rgba(255,255,255,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .step-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        .code-structure {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.9em;
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+        .folder { color: #fbb6ce; }
+        .file { color: #90cdf4; }
+        .indent { margin-left: 20px; }
+        @media (max-width: 768px) {
+            .architecture-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+            }
+            .nextjs-core {
+                grid-column: 1;
+                grid-row: auto;
+            }
+            .build-layer, .deployment {
+                grid-column: 1;
+            }
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+            .nextjs-features {
+                grid-template-columns: 1fr;
+            }
+            .flow-steps {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Next.js Full Architecture</h1>
+        
+        <div class="architecture-grid">
+            <!-- Client Layer -->
+            <div class="layer client-layer">
+                <div class="layer-title">🌐 Client/Browser Layer</div>
+                <div class="component-grid">
+                    <div class="component">React Components</div>
+                    <div class="component">Client-Side Routing</div>
+                    <div class="component">State Management</div>
+                    <div class="component">Browser APIs</div>
+                    <div class="component">Hydration</div>
+                    <div class="component">Service Workers</div>
+                </div>
+            </div>
+
+            <!-- Next.js Core -->
+            <div class="layer nextjs-core">
+                <div class="layer-title">⚡ Next.js Core Framework</div>
+                <div class="nextjs-features">
+                    <div class="feature-group">
+                        <h4>🔄 Routing System</h4>
+                        <ul class="feature-list">
+                            <li>File-based routing</li>
+                            <li>Dynamic routes</li>
+                            <li>Nested layouts</li>
+                            <li>Route groups</li>
+                            <li>Parallel routes</li>
+                        </ul>
+                    </div>
+                    <div class="feature-group">
+                        <h4>🎨 Rendering Methods</h4>
+                        <ul class="feature-list">
+                            <li>Server-Side Rendering (SSR)</li>
+                            <li>Static Site Generation (SSG)</li>
+                            <li>Incremental Static Regeneration (ISR)</li>
+                            <li>Client-Side Rendering (CSR)</li>
+                        </ul>
+                    </div>
+                    <div class="feature-group">
+                        <h4>📊 Data Fetching</h4>
+                        <ul class="feature-list">
+                            <li>getServerSideProps</li>
+                            <li>getStaticProps</li>
+                            <li>getStaticPaths</li>
+                            <li>SWR integration</li>
+                            <li>React Query support</li>
+                        </ul>
+                    </div>
+                    <div class="feature-group">
+                        <h4>🚀 Optimizations</h4>
+                        <ul class="feature-list">
+                            <li>Automatic image optimization</li>
+                            <li>Code splitting</li>
+                            <li>Bundle analysis</li>
+                            <li>Font optimization</li>
+                            <li>Script optimization</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="feature-group" style="margin-top: 20px;">
+                    <h4>🔌 API Routes & Middleware</h4>
+                    <ul class="feature-list">
+                        <li>Server functions</li>
+                        <li>API endpoints</li>
+                        <li>Middleware</li>
+                        <li>Edge functions</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Server Layer -->
+            <div class="layer server-layer">
+                <div class="layer-title">🖥️ Server Layer</div>
+                <div class="component-grid">
+                    <div class="component">Node.js Runtime</div>
+                    <div class="component">Server Components</div>
+                    <div class="component">API Handlers</div>
+                    <div class="component">Middleware</div>
+                    <div class="component">Edge Runtime</div>
+                    <div class="component">Serverless Functions</div>
+                </div>
+            </div>
+
+            <!-- File Structure -->
+            <div class="layer file-structure">
+                <div class="layer-title">📁 Project Structure</div>
+                <div class="code-structure">
+<span class="folder">📁 my-nextjs-app/</span>
+<div class="indent"><span class="folder">📁 app/</span> (or pages/)</div>
+<div class="indent indent"><span class="file">📄 layout.tsx</span></div>
+<div class="indent indent"><span class="file">📄 page.tsx</span></div>
+<div class="indent indent"><span class="folder">📁 api/</span></div>
+<div class="indent"><span class="folder">📁 components/</span></div>
+<div class="indent"><span class="folder">📁 public/</span></div>
+<div class="indent"><span class="folder">📁 styles/</span></div>
+<div class="indent"><span class="file">📄 next.config.js</span></div>
+<div class="indent"><span class="file">📄 package.json</span></div>
+<div class="indent"><span class="file">📄 tsconfig.json</span></div>
+                </div>
+            </div>
+
+            <!-- External Services -->
+            <div class="layer external-services">
+                <div class="layer-title">🔗 External Services</div>
+                <div class="component-grid">
+                    <div class="component">Databases</div>
+                    <div class="component">CDN</div>
+                    <div class="component">External APIs</div>
+                    <div class="component">Authentication</div>
+                    <div class="component">Analytics</div>
+                    <div class="component">Payment Systems</div>
+                </div>
+            </div>
+
+            <!-- Build Process -->
+            <div class="layer build-layer">
+                <div class="layer-title">🔧 Build & Development Process</div>
+                <div class="component-grid">
+                    <div class="component">Webpack/Turbopack</div>
+                    <div class="component">Hot Module Replacement</div>
+                    <div class="component">TypeScript</div>
+                    <div class="component">ESLint Integration</div>
+                    <div class="component">CSS/SCSS/Tailwind</div>
+                    <div class="component">Environment Config</div>
+                    <div class="component">Testing Framework</div>
+                    <div class="component">Development Server</div>
+                </div>
+            </div>
+
+            <!-- Deployment -->
+            <div class="layer deployment">
+                <div class="layer-title">🚀 Deployment & Hosting</div>
+                <div class="component-grid">
+                    <div class="component">Vercel</div>
+                    <div class="component">Netlify</div>
+                    <div class="component">AWS</div>
+                    <div class="component">Google Cloud</div>
+                    <div class="component">Docker</div>
+                    <div class="component">Self-hosted</div>
+                    <div class="component">Edge Functions</div>
+                    <div class="component">Serverless</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Flow -->
+        <div class="flow-description">
+            <h3>🔄 Request Lifecycle & Data Flow</h3>
+            <div class="flow-steps">
+                <div class="flow-step">
+                    <div class="step-number">1. Initial Request</div>
+                    Browser requests a page from Next.js application
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">2. Route Matching</div>
+                    Next.js router matches the URL to the appropriate page/component
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">3. Server Rendering</div>
+                    Server renders components and fetches data (SSR/SSG)
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">4. HTML Response</div>
+                    Optimized HTML with data sent to browser
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">5. Hydration</div>
+                    React takes over and makes the page interactive
+                </div>
+                <div class="flow-step">
+                    <div class="step-number">6. Client Navigation</div>
+                    Subsequent page changes handled client-side for speed
+                </div>
+            </div>
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 10px;">
+                <strong>Key Benefits:</strong> Fast initial page loads, SEO-friendly, Progressive enhancement, Optimal performance, Developer experience
+            </div>
+        </div>
+    </div>
+</body>
+</html>
